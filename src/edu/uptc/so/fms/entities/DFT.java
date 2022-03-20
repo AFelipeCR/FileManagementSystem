@@ -1,7 +1,8 @@
 package edu.uptc.so.fms.entities;
 
+import java.util.Arrays;
+
 public class DFT {
-	private short id;
 	private String name;
 	private short head;
 	private byte visibility;
@@ -10,9 +11,26 @@ public class DFT {
 	private short accessedAt;
 	private short[] children;
 	
+	public DFT(byte[] dftBytes) {
+		byte[] aux = Arrays.copyOfRange(dftBytes, 0, 11);
+		int i = 0;
+		String s = "";
+		
+		while(aux[i] != 0) {
+			s += (char) aux[i];
+			i++;
+		}
+		
+		this.name = s;
+		this.head = (short)(((dftBytes[11] & 0xFF) << 8) | (dftBytes[12] & 0xFF));
+		this.visibility = dftBytes[13];
+		this.createdAt = (short)(((dftBytes[14] & 0xFF) << 8) | (dftBytes[15] & 0xFF));;
+		this.updatedAt = (short)(((dftBytes[16] & 0xFF) << 8) | (dftBytes[17] & 0xFF));;
+		this.accessedAt = (short)(((dftBytes[18] & 0xFF) << 8) | (dftBytes[19] & 0xFF));
+	}
+	
 	public DFT(short id, String name, short head, byte visibility,
 			short createdAt, short updatedAt, short accessedAt, short[] children) {
-		this.id = id;
 		this.name = name;
 		this.head = head;
 		this.visibility = visibility;
@@ -24,7 +42,6 @@ public class DFT {
 	
 	public DFT(short id, String name, byte visibility,
 			short createdAt, short updatedAt, short accessedAt, short head) {
-		this.id = id;
 		this.name = name;
 		this.head = head;
 		this.visibility = visibility;
@@ -35,20 +52,11 @@ public class DFT {
 	
 	public DFT(short id, String name, byte visibility,
 			short createdAt, short updatedAt, short accessedAt) {
-		this.id = id;
 		this.name = name;
 		this.visibility = visibility;
 		this.createdAt = createdAt;
 		this.updatedAt = updatedAt;
 		this.accessedAt = accessedAt;
-	}
-	
-	public short getId() {
-		return id;
-	}
-	
-	public void setId(short id) {
-		this.id = id;
 	}
 	
 	public String getName() {
@@ -105,5 +113,37 @@ public class DFT {
 	
 	public void setChildren(short[] children) {
 		this.children = children;
+	}
+	
+	public String toText() {
+		return this.name + " " + this.head;
+	}
+
+	public byte[] toBytes() {
+		byte[] bytes = new byte[20];
+		byte[] bs;
+		
+		if(this.name.length() < 11) {
+			bs = this.name.getBytes();
+		}else {
+			this.name.substring(0, 11).getBytes();
+			bs = this.name.getBytes();
+		}
+		
+		for (int i = 0; i < bs.length; i++) {
+			bytes[i] = bs[i];
+		}
+		
+		bytes[11] = (byte)(this.head & 0xff);
+		bytes[12] = (byte)((this.head >> 8) & 0xff);
+		bytes[13] = this.visibility;
+		bytes[14] = (byte)(this.createdAt & 0xff);
+		bytes[15] = (byte)((this.createdAt >> 8) & 0xff);
+		bytes[16] = (byte)(this.updatedAt & 0xff);
+		bytes[17] = (byte)((this.updatedAt >> 8) & 0xff);
+		bytes[18] = (byte)(this.accessedAt & 0xff);
+		bytes[19] = (byte)((this.accessedAt >> 8) & 0xff);
+		
+		return bytes;
 	}
 }

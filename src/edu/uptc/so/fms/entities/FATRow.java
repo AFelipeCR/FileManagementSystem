@@ -36,7 +36,7 @@ public class FATRow {
 	}
 	
 	public  String toText(){
-		return id + " " + status + " " + next;
+		return status + " " + id + " " + next;
 		
 	}
 }
