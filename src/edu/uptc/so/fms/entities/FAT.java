@@ -23,4 +23,8 @@ public class FAT {
 	public FATRow[] getRows() {
 		return rows;
 	}
+
+	public byte[] toBytes() {
+		return null;
+	}
 }

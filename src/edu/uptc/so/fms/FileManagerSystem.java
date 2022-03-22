@@ -1,5 +1,6 @@
 package edu.uptc.so.fms;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,9 +21,39 @@ public class FileManagerSystem {
 	public void main(String[] args) {
 	}
 	
-	public void write(String path, byte[] data){
+	public void overwrite(String path, byte[] data) {
+		if(!this.dirs.containsKey(path)) return;
+		
+		double blocks = Math.ceil(data.length / (double) Constants.CLUSTER_SIZE);
+		
+		DFT node = this.dirs.get(path);
+		FAT fat = getFAT();
+
+		short p = -1;
+
+		for (short i = 0, n = node.getHead(); i < blocks; i++, p=n, n = fat.getRows()[n].getNext()) {
+			int from = i * Constants.CLUSTER_SIZE;
+			int to = from  + Constants.CLUSTER_SIZE;
+			if(to > data.length) to = data.length;
+			if(n == -1) {
+				n = Resources.freeDir();
+				if(p == -1) node.setHead(n);
+				else fat.getRows()[p].setNext(n);
+			}
+			// Resources.writeDisk(n, Arrays.copyOfRange(data, from, to)); 
+		}
+		clearBlocks(p, fat);
 	}
 	
+	private void clearBlocks(short parent, FAT fat) {
+		short next = fat.getRows()[parent].getNext();
+		for (short i = next; fat.getRows()[i].getStatus() == 1; i = fat.getRows()[i].getNext()) {
+			fat.getRows()[i].setStatus((byte) 0);
+		}
+		fat.getRows()[parent].setNext((short)-1);
+		Resources.writeDisk(0, fat.toBytes());
+	}
+
 	public void write(String path, FileType type){
 		String[] aux = path.split("/");
 		DFT dirAux = this.rootDir;
