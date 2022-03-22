@@ -24,12 +24,17 @@ public class FAT {
 		return rows;
 	}
 
+
 	public FATRow freeRow() {
 		for (FATRow fatRow : rows) {
 			if(fatRow.getStatus() == 0)
 				return fatRow;
 		}
 		
+		return null;
+}
+
+	public byte[] toBytes() {
 		return null;
 	}
 }
