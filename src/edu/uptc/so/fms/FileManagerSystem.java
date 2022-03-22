@@ -35,14 +35,19 @@ public class FileManagerSystem {
 			int from = i * Constants.CLUSTER_SIZE;
 			int to = from  + Constants.CLUSTER_SIZE;
 			if(to > data.length) to = data.length;
-			if(n == -1) {
+			if(n == 0 || n == -1) {
 				n = Resources.freeDir();
 				if(p == -1) node.setHead(n);
 				else fat.getRows()[p].setNext(n);
 			}
-			// Resources.writeDisk(n, Arrays.copyOfRange(data, from, to)); 
+			fat.getRows()[n].setStatus((byte) 1);
+			Resources.writeDisk(getPositionToWrite(n), Arrays.copyOfRange(data, from, to)); 
 		}
 		clearBlocks(p, fat);
+	}
+
+	public int getPositionToWrite(short block){
+		return Constants.RESERVED_SPACE + block * Constants.CLUSTER_SIZE;
 	}
 	
 	private void clearBlocks(short parent, FAT fat) {
