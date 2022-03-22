@@ -37,18 +37,6 @@ public class DFT {
 			this.children = new DFT[100];
 	}
 	
-	public DFT(short id, FileType type, String name, byte visibility, long createdAt) {
-		this.id = id;
-		this.type = (byte) type.ordinal();
-		this.name = name;
-		this.head = -1;
-		this.visibility = visibility;
-		this.createdAt = this.updatedAt = this.accessedAt = createdAt;
-		
-		if(type == FileType.DIR)
-			this.children = new DFT[100];
-	}
-	
 	public DFT(short id, FileType type, String name, short head, byte visibility, long createdAt) {
 		this.id = id;
 		this.type = (byte) type.ordinal();
@@ -134,21 +122,6 @@ public class DFT {
 		return this.children[i - 1] = new DFT(id, type, path, head, (byte) Attributes.NORMAL.ordinal(),
 				System.currentTimeMillis());
 	}
-	
-	public DFT add(String path, short id, FileType type) {
-		int i = 0;
-
-		DFT aux = this.children[i];
-		i++;
-		
-		while (aux != null && i < this.children.length) {
-			aux = this.children[i];
-			i++;
-		}
-		
-		return this.children[i - 1] = new DFT(id, type, path, (byte) Attributes.NORMAL.ordinal(),
-				System.currentTimeMillis());
-	}
 
 	public short getId() {
 		return id;
@@ -191,5 +164,18 @@ public class DFT {
 	
 	public DFT[] getChildrenDfts() {
 		return children;
+	}
+	
+	public void setChildren(DFT[] children) {
+		this.children = children;
+	}
+
+	public static short[] childrenIds(byte[] childrenBytes) {
+		short[] ids = new short[100];
+		for (int i = 0, j = 0; i < childrenBytes.length && j < ids.length ; i+=2, j++) {
+			ids[j] = Utils.bytesToShort(Arrays.copyOfRange(childrenBytes, i, i + 2));
+		}
+		
+		return ids;
 	}
 }
