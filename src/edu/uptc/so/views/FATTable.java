@@ -1,10 +1,9 @@
 
 package edu.uptc.so.views;
 
-import edu.uptc.so.fms.entities.DFT;
+import edu.uptc.so.fms.entities.FATRow;
 import java.awt.BorderLayout;
 import java.awt.event.ActionListener;
-
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -12,20 +11,20 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
-public class DFTTable extends JPanel{
+public class FATTable extends JPanel{
     
-	private static final long serialVersionUID = 1L;
-	private JTable tableProces;
+    private static final long serialVersionUID = 1L;
+    private JTable tableProces;
     private DefaultTableModel modelo;
     private JLabel lblTitle;
     private JButton jButton;
-    
-    public DFTTable(ActionListener listener) {
-        buildtable(listener);
+
+    public FATTable(ActionListener listener) {
+        createTable(listener);
     }
-    
-    public void buildtable(ActionListener listener){
-        setLayout(new BorderLayout());
+
+    private void createTable(ActionListener listener) {
+         setLayout(new BorderLayout());
         lblTitle = new JLabel("DFT info");
         jButton = new JButton("Arbol");
 		jButton.addActionListener(listener);
@@ -33,28 +32,25 @@ public class DFTTable extends JPanel{
         add(lblTitle, BorderLayout.NORTH);
         modelo = new DefaultTableModel();
         //"id", "type", "name", "head", "visibility","createdAt","updatedAt", "accessedAt", "size","children"
-        String[] headers = {"name", "head", "visibility", "Sons"};
+        String[] headers = {"Status", "id", "next"};
         modelo.setColumnIdentifiers(headers);
         tableProces = new JTable(modelo);
         add(new JScrollPane(tableProces),BorderLayout.CENTER);
     }
     
-    public void setInfoTable(DFT root){
+    public void setInfoTable(FATRow[] row){
         modelo.setRowCount(0);
-        String[] info = {root.getName(), root.getHead() +"", 
-            root.getVisibility() +"", root.getChildrenDfts().length +""};
-            modelo.addRow(info);
-        fillWithTree(root.getChildrenDfts());
+        fillWithList(row);
     }
     
-    public void fillWithTree(DFT[] root){
-        for (int i = 0; i < root.length; i++) {
-            if (root[i]!=null) {
-                String[] info = {root[i].getName(), root[i].getHead() +"",
-                    root[i].getVisibility() +"",root[i].getChildrenDfts().length +"" };
+    public void fillWithList(FATRow[] row){
+        for (int i = 0; i < row.length; i++) {
+            if (row[i]!=null) {
+                        String[] info = {row[i].getStatus()+"",
+                            row[i].getId()+"", row[i].getNext() +""};
                 modelo.addRow(info);
-                fillWithTree(root[i].getChildrenDfts());
             }
         }
     }
+    
 }

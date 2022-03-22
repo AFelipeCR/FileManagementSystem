@@ -4,13 +4,14 @@ import java.awt.event.*;
 import javax.swing.*;
 
 import edu.uptc.so.fms.entities.DFT;
+import edu.uptc.so.fms.entities.FATRow;
 
 public class JpCard extends JPanel implements ActionListener{
 
 	private static final long serialVersionUID = 1L;
 	private CardLayout cards = new CardLayout( );
 
-	public JpCard(DFT root) {
+	public JpCard(DFT root, FATRow[] row) {
 		setLayout(null);
 		setLayout(cards);
 		
@@ -22,7 +23,9 @@ public class JpCard extends JPanel implements ActionListener{
 		dftTable.setInfoTable(root);
 		add(dftTable);
 		
-		
+		FATTable fattable = new FATTable(this);
+                fattable.setInfoTable(row);
+                add(fattable);
 	}
 	
 //	public static void main(String[] args) {
