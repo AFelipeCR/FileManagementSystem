@@ -8,6 +8,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.util.Random;
 
 import edu.uptc.so.fms.Constants;
 
@@ -89,5 +90,9 @@ public class Resources {
 		} catch (FileNotFoundException e) {
 		} catch (IOException e) {
 		}
+	}
+
+	public static short freeDir() {
+		return (short) (new Random().nextInt(99) + 1);
 	}
 }

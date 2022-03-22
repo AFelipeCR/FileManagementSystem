@@ -1,149 +1,148 @@
 package edu.uptc.so.fms.entities;
 
+import java.text.Format;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
+
+import edu.uptc.so.fms.Attributes;
+import edu.uptc.so.fms.Constants;
+import edu.uptc.so.fms.FileType;
+import edu.uptc.so.fms.utils.Utils;
 
 public class DFT {
+	private short id;
+	private byte type;
 	private String name;
 	private short head;
 	private byte visibility;
-	private short createdAt;
-	private short updatedAt;
-	private short accessedAt;
+	private long createdAt;
+	private long updatedAt;
+	private long accessedAt;
+	private short size;
 	private short[] children;
-	
+	private DFT[] childrenDfts;
+
 	public DFT(byte[] dftBytes) {
-		byte[] aux = Arrays.copyOfRange(dftBytes, 0, 11);
-		int i = 0;
-		String s = "";
+		this.id = Utils.bytesToShort(Arrays.copyOfRange(dftBytes, 0, 2));
+		this.type = dftBytes[2];
+		this.name = Utils.bytesToString(Arrays.copyOfRange(dftBytes, 0, 11), 3, 11);
+		this.head = Utils.bytesToShort(Arrays.copyOfRange(dftBytes, 14, 16));
+		this.visibility = dftBytes[16];
+		this.createdAt = Utils.bytesToLong(Arrays.copyOfRange(dftBytes, 17, 25));
+		this.updatedAt = Utils.bytesToLong(Arrays.copyOfRange(dftBytes, 25, 33));
+		this.accessedAt = Utils.bytesToLong(Arrays.copyOfRange(dftBytes, 33, 41));
+		this.size = Utils.bytesToShort(Arrays.copyOfRange(dftBytes, 41, 43));
 		
-		while(aux[i] != 0) {
-			s += (char) aux[i];
-			i++;
-		}
+		if(this.type == FileType.DIR.ordinal())
+			this.childrenDfts = new DFT[100];
+	}
+
+	public DFT(short id, byte type, String name, byte visibility, long createdAt) {
+		this.id = id;
+		this.type = type;
+		this.name = name;
+		this.head = -1;
+		this.visibility = visibility;
+		this.createdAt = this.updatedAt = this.accessedAt = createdAt;
 		
-		this.name = s;
-		this.head = (short)(((dftBytes[11] & 0xFF) << 8) | (dftBytes[12] & 0xFF));
-		this.visibility = dftBytes[13];
-		this.createdAt = (short)(((dftBytes[14] & 0xFF) << 8) | (dftBytes[15] & 0xFF));;
-		this.updatedAt = (short)(((dftBytes[16] & 0xFF) << 8) | (dftBytes[17] & 0xFF));;
-		this.accessedAt = (short)(((dftBytes[18] & 0xFF) << 8) | (dftBytes[19] & 0xFF));
+		if(this.type == FileType.DIR.ordinal())
+			this.childrenDfts = new DFT[100];
 	}
-	
-	public DFT(short id, String name, short head, byte visibility,
-			short createdAt, short updatedAt, short accessedAt, short[] children) {
-		this.name = name;
-		this.head = head;
-		this.visibility = visibility;
-		this.createdAt = createdAt;
-		this.updatedAt = updatedAt;
-		this.accessedAt = accessedAt;
-		this.children = children;
-	}
-	
-	public DFT(short id, String name, byte visibility,
-			short createdAt, short updatedAt, short accessedAt, short head) {
-		this.name = name;
-		this.head = head;
-		this.visibility = visibility;
-		this.createdAt = createdAt;
-		this.updatedAt = updatedAt;
-		this.accessedAt = accessedAt;
-	}
-	
-	public DFT(short id, String name, byte visibility,
-			short createdAt, short updatedAt, short accessedAt) {
-		this.name = name;
-		this.visibility = visibility;
-		this.createdAt = createdAt;
-		this.updatedAt = updatedAt;
-		this.accessedAt = accessedAt;
-	}
-	
+
 	public String getName() {
 		return name;
 	}
-	
+
 	public void setName(String name) {
 		this.name = name;
 	}
-	
+
 	public short getHead() {
 		return head;
 	}
-	
+
 	public void setHead(short head) {
 		this.head = head;
 	}
-	
+
 	public byte getVisibility() {
 		return visibility;
 	}
-	
+
 	public void setVisibility(byte visibility) {
 		this.visibility = visibility;
 	}
-	
-	public short getCreatedAt() {
-		return createdAt;
-	}
-	
-	public void setCreatedAt(short createdAt) {
-		this.createdAt = createdAt;
-	}
-	
-	public short getUpdatedAt() {
-		return updatedAt;
-	}
-	
-	public void setUpdatedAt(short updatedAt) {
-		this.updatedAt = updatedAt;
-	}
-	
-	public short getAccessedAt() {
-		return accessedAt;
-	}
-	
-	public void setAccessedAt(short accessedAt) {
-		this.accessedAt = accessedAt;
-	}
-	
+
 	public short[] getChildren() {
 		return children;
 	}
-	
+
 	public void setChildren(short[] children) {
 		this.children = children;
 	}
-	
+
 	public String toText() {
-		return this.name + " " + this.head;
+		Format format = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+		return this.id + " name: " + this.name + " " + FileType.values()[this.type] + " "
+				+ Attributes.values()[this.visibility] + " " + format.format(new Date(this.createdAt)) + " "
+				+ format.format(new Date(this.updatedAt));
 	}
 
 	public byte[] toBytes() {
-		byte[] bytes = new byte[20];
-		byte[] bs;
-		
-		if(this.name.length() < 11) {
-			bs = this.name.getBytes();
-		}else {
-			this.name.substring(0, 11).getBytes();
-			bs = this.name.getBytes();
-		}
-		
-		for (int i = 0; i < bs.length; i++) {
-			bytes[i] = bs[i];
-		}
-		
-		bytes[11] = (byte)(this.head & 0xff);
-		bytes[12] = (byte)((this.head >> 8) & 0xff);
-		bytes[13] = this.visibility;
-		bytes[14] = (byte)(this.createdAt & 0xff);
-		bytes[15] = (byte)((this.createdAt >> 8) & 0xff);
-		bytes[16] = (byte)(this.updatedAt & 0xff);
-		bytes[17] = (byte)((this.updatedAt >> 8) & 0xff);
-		bytes[18] = (byte)(this.accessedAt & 0xff);
-		bytes[19] = (byte)((this.accessedAt >> 8) & 0xff);
-		
+		byte[] bytes = new byte[Constants.DFT_SIZE];
+		Utils.fillBytes(bytes, Utils.shortToBytes(this.id), 0);
+		bytes[2] = this.type;
+		Utils.fillBytes(bytes, Utils.stringToBytes(this.name, 11), 3);
+		Utils.fillBytes(bytes, Utils.shortToBytes(this.head), 14);
+		bytes[16] = this.visibility;
+		Utils.fillBytes(bytes, Utils.longToBytes(this.createdAt), 17);
+		Utils.fillBytes(bytes, Utils.longToBytes(this.updatedAt), 25);
+		Utils.fillBytes(bytes, Utils.longToBytes(this.accessedAt), 33);
+		Utils.fillBytes(bytes, Utils.shortToBytes(this.size), 41);
+
 		return bytes;
+	}
+
+	public DFT contains(String filename) {
+		DFT d = null;
+
+		for (DFT s : this.childrenDfts) {
+			if (s != null && s.name.contentEquals(filename)) {
+				d = s;
+				break;
+			}
+		}
+
+		return d;
+	}
+
+	public DFT add(String path, short id) {
+		int i = 0;
+
+		DFT aux = this.childrenDfts[i];
+		i++;
+		while (aux != null && i < this.childrenDfts.length) {
+			aux = this.childrenDfts[i];
+			i++;
+		}
+		
+		return this.childrenDfts[i - 1] = new DFT(id, (byte) FileType.DIR.ordinal(), path, (byte) Attributes.NORMAL.ordinal(),
+				System.currentTimeMillis());
+	}
+
+	public String longListing() {
+		String s = "";
+		
+		for (DFT c : childrenDfts) {
+			if(c != null)
+				s += c.name+ " ";
+		}
+		
+		return s;
+	}
+	
+	public DFT[] getChildrenDfts() {
+		return childrenDfts;
 	}
 }
