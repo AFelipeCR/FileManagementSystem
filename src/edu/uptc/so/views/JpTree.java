@@ -1,9 +1,11 @@
 package edu.uptc.so.views;
 
 import java.awt.BorderLayout;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -23,9 +25,10 @@ public class JpTree extends JPanel implements MouseListener{
 	private JPopupMenu jPopMenu;
 	private DefaultTreeModel treeModel;
 	private DFT root;
+	private JButton jButton;
 
-	public JpTree(DFT root) {
-		initcomponents();
+	public JpTree(DFT root, ActionListener listener) {
+		initcomponents(listener);
 		setupLayoutManager();
 		paintTree(root);
 		setVisible(true);
@@ -58,13 +61,16 @@ public class JpTree extends JPanel implements MouseListener{
 		}
 	} 
 	
-	private void initcomponents() {
+	private void initcomponents(ActionListener listener) {
 		jTree = new JTree();
+		jButton = new JButton("Tabla");
+		jButton.addActionListener(listener);
 	}
 	
 	private void setupLayoutManager() {
 		setLayout(new BorderLayout());
 		JScrollPane jScrollPane = new JScrollPane(jTree);
+		add(jButton, BorderLayout.SOUTH);
 		add(jScrollPane, BorderLayout.CENTER);
 	}
 
@@ -110,8 +116,8 @@ public class JpTree extends JPanel implements MouseListener{
 		if(dft != null ){
 			JLabel jlName = new JLabel("Nombre:      " + dft.getName());
 			JLabel jlPath = new JLabel("Ubicación:  " + path(treePath));
-			JLabel jlCreatedAt = new JLabel("Creado:       " + dft.getName()); //
-			JLabel jlSize = new JLabel("Tamaño:     " + dft.getName()); //
+			JLabel jlCreatedAt = new JLabel("Creado:       " + dft.getName()); // getCreatedAt
+			JLabel jlSize = new JLabel("Tamaño:     " + dft.getName()); //getSize
 			jPopMenu.add(jlName);
 			jPopMenu.add(jlPath);
 			jPopMenu.add(jlCreatedAt);

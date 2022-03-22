@@ -3,6 +3,9 @@ package edu.uptc.so.views;
 
 import edu.uptc.so.fms.entities.DFT;
 import java.awt.BorderLayout;
+import java.awt.event.ActionListener;
+
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -11,16 +14,22 @@ import javax.swing.table.DefaultTableModel;
 
 public class DFTTable extends JPanel{
     
-    private JTable tableProces;
+	private static final long serialVersionUID = 1L;
+	private JTable tableProces;
     private DefaultTableModel modelo;
     private JLabel lblTitle;
-
-    public DFTTable() {
-        buildtable();
+    private JButton jButton;
+    
+    public DFTTable(ActionListener listener) {
+        buildtable(listener);
     }
-    public void buildtable(){
+    
+    public void buildtable(ActionListener listener){
         setLayout(new BorderLayout());
         lblTitle = new JLabel("DFT info");
+        jButton = new JButton("Árbol");
+		jButton.addActionListener(listener);
+		add(jButton, BorderLayout.SOUTH);
         add(lblTitle, BorderLayout.NORTH);
         modelo = new DefaultTableModel();
         //"id", "type", "name", "head", "visibility","createdAt","updatedAt", "accessedAt", "size","children"
@@ -40,9 +49,11 @@ public class DFTTable extends JPanel{
     
     public void fillWithTree(DFT[] root){
         for (int i = 0; i < root.length; i++) {
-            String[] info = {root[i].getName(), root[i].getHead() +"", root[i].getVisibility() +""};
-            modelo.addRow(info);
-            fillWithTree(root[i].getChildrenDfts());
+        	if (root[i]!=null) {
+        		String[] info = {root[i].getName(), root[i].getHead() +"", root[i].getVisibility() +""};
+                modelo.addRow(info);
+                fillWithTree(root[i].getChildrenDfts());
+        	}
         }
     }
 }
