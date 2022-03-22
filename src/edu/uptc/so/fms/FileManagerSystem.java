@@ -1,10 +1,12 @@
 package edu.uptc.so.fms;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 import edu.uptc.so.fms.entities.DFT;
 import edu.uptc.so.fms.entities.FAT;
+import edu.uptc.so.fms.entities.FATRow;
 import test.Resources;
 
 public class FileManagerSystem {
@@ -34,18 +36,25 @@ public class FileManagerSystem {
 		this.dirs.put(path, dirAux.add(aux[aux.length - 1], Resources.freeDir()));
 	}
 	
-	public DFT read(String path){
-		if(this.dirs.containsKey(path))
-			return this.dirs.get(path);
-
-		String[] aux = path.split("/");
-		DFT dirAux = this.rootDir;
-		
-		for (int i = 0; i < aux.length; i++) {
-			dirAux = dirAux.contains(aux[i]);
+	public short[] read(String path){
+		//Searches for path in dirs if exists set auxHead to head
+		ArrayList<Short> blocksIDs = new ArrayList<Short>();
+		short auxHead = open(path);
+		FATRow aux = getFAT().getRowByID(auxHead);
+		//Traverse tree until next is -1
+		blocksIDs.add(auxHead);
+		short count = 0, maxBlocks = 1000;
+		while(aux.getNext() != -1) {
+			blocksIDs.add(aux.getId());
+			aux = getFAT().getRowByID(aux.getNext());
+			count ++;
 		}
-		
-		return dirAux;
+		//Convert from arrayList to regular Array
+		short[] toReturn = new short[blocksIDs.size()];
+		for(int i = 0; i < toReturn.length; i++) {
+			toReturn[i] = blocksIDs.get(i);
+		}
+		return toReturn;
 	}
 	
 	public short open(String path){

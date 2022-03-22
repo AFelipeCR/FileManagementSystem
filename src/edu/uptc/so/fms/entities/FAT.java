@@ -23,4 +23,17 @@ public class FAT {
 	public FATRow[] getRows() {
 		return rows;
 	}
+	
+	public FATRow getRowByID(short id) {
+		//Traverses all of the rows and if id matches return FATRow element if there´s no match, return null
+		boolean found = false;
+		int count = 0;
+		while(!found && count < rows.length) {
+			if(id == rows[count].getId()) {
+				return rows[count];
+			}
+			count++;
+		}
+		return null;
+	}
 }
