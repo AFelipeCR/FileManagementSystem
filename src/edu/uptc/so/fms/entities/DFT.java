@@ -20,8 +20,7 @@ public class DFT {
 	private long updatedAt;
 	private long accessedAt;
 	private short size;
-	private short[] children;
-	private DFT[] childrenDfts;
+	private DFT[] children;
 
 	public DFT(byte[] dftBytes) {
 		this.id = Utils.bytesToShort(Arrays.copyOfRange(dftBytes, 0, 2));
@@ -35,7 +34,7 @@ public class DFT {
 		this.size = Utils.bytesToShort(Arrays.copyOfRange(dftBytes, 41, 43));
 		
 		if(this.type == FileType.DIR.ordinal())
-			this.childrenDfts = new DFT[100];
+			this.children = new DFT[100];
 	}
 
 	public DFT(short id, byte type, String name, byte visibility, long createdAt) {
@@ -47,7 +46,7 @@ public class DFT {
 		this.createdAt = this.updatedAt = this.accessedAt = createdAt;
 		
 		if(this.type == FileType.DIR.ordinal())
-			this.childrenDfts = new DFT[100];
+			this.children = new DFT[100];
 	}
 
 	public String getName() {
@@ -72,14 +71,6 @@ public class DFT {
 
 	public void setVisibility(byte visibility) {
 		this.visibility = visibility;
-	}
-
-	public short[] getChildren() {
-		return children;
-	}
-
-	public void setChildren(short[] children) {
-		this.children = children;
 	}
 
 	public String toText() {
@@ -107,7 +98,7 @@ public class DFT {
 	public DFT contains(String filename) {
 		DFT d = null;
 
-		for (DFT s : this.childrenDfts) {
+		for (DFT s : this.children) {
 			if (s != null && s.name.contentEquals(filename)) {
 				d = s;
 				break;
@@ -120,21 +111,21 @@ public class DFT {
 	public DFT add(String path, short id) {
 		int i = 0;
 
-		DFT aux = this.childrenDfts[i];
+		DFT aux = this.children[i];
 		i++;
-		while (aux != null && i < this.childrenDfts.length) {
-			aux = this.childrenDfts[i];
+		while (aux != null && i < this.children.length) {
+			aux = this.children[i];
 			i++;
 		}
 		
-		return this.childrenDfts[i - 1] = new DFT(id, (byte) FileType.DIR.ordinal(), path, (byte) Attributes.NORMAL.ordinal(),
+		return this.children[i - 1] = new DFT(id, (byte) FileType.DIR.ordinal(), path, (byte) Attributes.NORMAL.ordinal(),
 				System.currentTimeMillis());
 	}
 
 	public String longListing() {
 		String s = "";
 		
-		for (DFT c : childrenDfts) {
+		for (DFT c : children) {
 			if(c != null)
 				s += c.name+ " ";
 		}
@@ -143,6 +134,6 @@ public class DFT {
 	}
 	
 	public DFT[] getChildrenDfts() {
-		return childrenDfts;
+		return children;
 	}
 }
