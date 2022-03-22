@@ -1,5 +1,7 @@
 package edu.uptc.so.fms.entities;
 
+import edu.uptc.so.fms.utils.Utils;
+
 public class FATRow {
 	private byte status;
 	private short id;
@@ -23,10 +25,6 @@ public class FATRow {
 		return id;
 	}
 
-	public void setId(short id) {
-		this.id = id;
-	}
-
 	public short getNext() {
 		return next;
 	}
@@ -38,5 +36,13 @@ public class FATRow {
 	public  String toText(){
 		return status + " " + id + " " + next;
 		
+	}
+
+	public byte[] toBytes() {
+		byte[] bs = new byte[3];
+		bs[0] = this.status;
+		Utils.fillBytes(bs, Utils.shortToBytes(this.next), 1);
+		
+		return bs;
 	}
 }
