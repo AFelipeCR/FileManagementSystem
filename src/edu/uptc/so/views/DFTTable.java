@@ -16,6 +16,7 @@ public class DFTTable extends JPanel{
     private JLabel lblTitle;
 
     public DFTTable() {
+        buildtable();
     }
     public void buildtable(){
         setLayout(new BorderLayout());
