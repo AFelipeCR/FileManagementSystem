@@ -35,6 +35,8 @@ public class FAT {
 }
 
 	public byte[] toBytes() {
-		return null;
+		byte[] bs = new byte[Constants.FAT_SIZE];
+		
+		return bs;
 	}
 }

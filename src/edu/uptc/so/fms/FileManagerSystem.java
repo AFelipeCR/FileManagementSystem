@@ -1,5 +1,6 @@
 package edu.uptc.so.fms;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,24 +22,11 @@ public class FileManagerSystem {
 		this.dirs = new HashMap<String, DFT>();
 	}
 
-	public void main(String[] args) {
-	}
-
-	/**
-	 * Sobreescribir archivo
-	 * 
-	 * @param path
-	 * @param data
-	 */
-	public void write(String path, byte[] data) {
-	}
-
 	public void overwrite(String path, byte[] data) {
 		if (!this.dirs.containsKey(path))
 			return;
 
 		double blocks = Math.ceil(data.length / (double) Constants.CLUSTER_SIZE);
-
 		DFT node = this.dirs.get(path);
 
 		short p = -1;
@@ -46,25 +34,37 @@ public class FileManagerSystem {
 		for (short i = 0, n = node.getHead(); i < blocks; i++, p = n, n = this.fat.getRows()[n].getNext()) {
 			int from = i * Constants.CLUSTER_SIZE;
 			int to = from + Constants.CLUSTER_SIZE;
+
 			if (to > data.length)
 				to = data.length;
-			if (n == -1) {
+
+			if (n == 0 || n == -1) {
 				n = Resources.freeDir();
+
 				if (p == -1)
 					node.setHead(n);
 				else
 					fat.getRows()[p].setNext(n);
 			}
-			// Resources.writeDisk(n, Arrays.copyOfRange(data, from, to));
+
+			fat.getRows()[n].setStatus((byte) 1);
+			Resources.writeDisk(getPositionToWrite(n), Arrays.copyOfRange(data, from, to));
 		}
+
 		clearBlocks(p, fat);
+	}
+
+	public int getPositionToWrite(short block) {
+		return Constants.RESERVED_SPACE + block * Constants.CLUSTER_SIZE;
 	}
 
 	private void clearBlocks(short parent, FAT fat) {
 		short next = fat.getRows()[parent].getNext();
+		
 		for (short i = next; fat.getRows()[i].getStatus() == 1; i = fat.getRows()[i].getNext()) {
 			fat.getRows()[i].setStatus((byte) 0);
 		}
+		
 		fat.getRows()[parent].setNext((short) -1);
 		Resources.writeDisk(0, fat.toBytes());
 	}
@@ -159,8 +159,9 @@ public class FileManagerSystem {
 				Constants.CLUSTER_SIZE));
 
 		for (int i = 0; i < dfts.length; i++) {
-			if(ids[i] != 0)
-				dfts[i] = new DFT(Resources.readDisk(Constants.FAT_SIZE + ids[i] * Constants.DFT_SIZE, Constants.DFT_SIZE));
+			if (ids[i] != 0)
+				dfts[i] = new DFT(
+						Resources.readDisk(Constants.FAT_SIZE + ids[i] * Constants.DFT_SIZE, Constants.DFT_SIZE));
 		}
 
 		this.rootDir.setChildren(dfts);
