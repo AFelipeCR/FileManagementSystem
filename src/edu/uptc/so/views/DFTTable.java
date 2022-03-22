@@ -31,10 +31,11 @@ public class DFTTable extends JPanel{
         add(new JScrollPane(tableProces),BorderLayout.CENTER);
     }
     
-    public void setInfoTable(DFT[] root){
-
+    public void setInfoTable(DFT root){
         modelo.setRowCount(0);
-        fillWithTree(root);
+        String[] info = {root.getName(), root.getHead() +"", root.getVisibility() +""};
+            modelo.addRow(info);
+        fillWithTree(root.getChildrenDfts());
     }
     
     public void fillWithTree(DFT[] root){
