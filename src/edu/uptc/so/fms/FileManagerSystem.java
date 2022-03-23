@@ -39,14 +39,13 @@ public class FileManagerSystem {
 				to = data.length;
 
 			if (n == 0 || n == -1) {
-				n = Resources.freeDir();
+				n = fat.freeRow().getId();
 
 				if (p == -1)
 					node.setHead(n);
 				else
 					fat.getRows()[p].setNext(n);
 			}
-
 			fat.getRows()[n].setStatus((byte) 1);
 			Resources.writeDisk(getPositionToWrite(n), Arrays.copyOfRange(data, from, to));
 		}
@@ -59,9 +58,10 @@ public class FileManagerSystem {
 	}
 
 	private void clearBlocks(short parent, FAT fat) {
+		if(parent == -1) return;
 		short next = fat.getRows()[parent].getNext();
 		
-		for (short i = next; fat.getRows()[i].getStatus() == 1; i = fat.getRows()[i].getNext()) {
+		for (short i = next; i != -1 && fat.getRows()[i].getStatus() == 1; i = fat.getRows()[i].getNext()) {
 			fat.getRows()[i].setStatus((byte) 0);
 		}
 		
@@ -149,6 +149,7 @@ public class FileManagerSystem {
 		DFT dft = new DFT((short) 1, FileType.DIR, "/", head.getId(), (byte) 0, System.currentTimeMillis());
 		Resources.writeDisk(head.getId() * Constants.FAT_ROW_SIZE, head.toBytes());
 		Resources.writeDisk(Constants.FAT_SIZE, dft.toBytes());
+		this.rootDir = dft;
 	}
 
 	public void init() {

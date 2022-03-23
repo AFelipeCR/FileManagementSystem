@@ -36,7 +36,9 @@ public class FAT {
 
 	public byte[] toBytes() {
 		byte[] bs = new byte[Constants.FAT_SIZE];
-		
+		for (int i = 0; i < rows.length; i++) {
+			System.arraycopy(rows[i].toBytes(), 0, bs, i * Constants.FAT_ROW_SIZE, Constants.FAT_ROW_SIZE);
+		}				
 		return bs;
 	}
 }
