@@ -36,37 +36,37 @@ public class JpTree extends JPanel implements MouseListener{
 	
 	
 	public void paintTree(DFT root) {
-            if(root != null){
-                this.root = root;
-		DefaultMutableTreeNode visualRoot = new DefaultMutableTreeNode(this.root.getName());
-		for (DFT child : this.root.getChildrenDfts()) {
-			if (child != null) {
-				addChild(visualRoot, child);
+		if(root != null){
+			this.root = root;
+			DefaultMutableTreeNode visualRoot = new DefaultMutableTreeNode(this.root.getName());
+			for (DFT child : this.root.getChildrenDfts()) {
+				if (child != null) {
+					addChild(visualRoot, child);
+				}
 			}
+			treeModel = new DefaultTreeModel(visualRoot);
+			jTree.addMouseListener(this);
+			jTree.setModel(treeModel);
+			jTree.repaint();
+		} else {
+			DefaultMutableTreeNode visualRoot = new DefaultMutableTreeNode("root empty");
+			treeModel = new DefaultTreeModel(visualRoot);
+			jTree.addMouseListener(this);
+			jTree.setModel(treeModel);
+			jTree.repaint();
 		}
-		treeModel = new DefaultTreeModel(visualRoot);
-		jTree.addMouseListener(this);
-		jTree.setModel(treeModel);
-		jTree.repaint();
-            }else{
-                DefaultMutableTreeNode visualRoot = new DefaultMutableTreeNode("root empty");
-                treeModel = new DefaultTreeModel(visualRoot);
-		jTree.addMouseListener(this);
-		jTree.setModel(treeModel);
-		jTree.repaint();
-            }
             
 	}
 	
 	private void addChild(DefaultMutableTreeNode father, DFT node) {
 		if (node != null) {
-                    DefaultMutableTreeNode visualNode = new DefaultMutableTreeNode(node.getName());
-                    father.add(visualNode);
-                    if(node.getChildrenDfts()[0]!=null) {
-                            for (DFT child : node.getChildrenDfts()) {
-                                    addChild(visualNode, child);
-                            }	
-                    }
+			DefaultMutableTreeNode visualNode = new DefaultMutableTreeNode(node.getName());
+			father.add(visualNode);
+			if(node.getChildrenDfts()[0]!=null) {
+				for (DFT child : node.getChildrenDfts()) {
+					addChild(visualNode, child);
+				}	
+			}
 		}
 	} 
 	
@@ -124,9 +124,9 @@ public class JpTree extends JPanel implements MouseListener{
 		DFT dft = searchDFT(nameDFT(path(treePath)), root);
 		if(dft != null ){
 			JLabel jlName = new JLabel("Nombre:      " + dft.getName());
-			JLabel jlPath = new JLabel("Ubicaciï¿½n:  " + path(treePath));
-			JLabel jlCreatedAt = new JLabel("Creado:       " + dft.getName()); // getCreatedAt
-			JLabel jlSize = new JLabel("Tamaï¿½o:     " + dft.getName()); //getSize
+			JLabel jlPath = new JLabel("Ubicacion:  " + path(treePath));
+			JLabel jlCreatedAt = new JLabel("Creado:       " + dft.getCreatedAt()); // getCreatedAt
+			JLabel jlSize = new JLabel("Tamaño:     " + dft.getSize()); //getSize
 			jPopMenu.add(jlName);
 			jPopMenu.add(jlPath);
 			jPopMenu.add(jlCreatedAt);
@@ -140,13 +140,13 @@ public class JpTree extends JPanel implements MouseListener{
 			DFT children = node.getChildrenDfts()[i];
 			while(children != null) {
 				DFT temp = searchDFT(nameDFT, children);
-	             if (temp!=null) {
-	                return  temp;
-	             }
-	            i++;
+				if (temp!=null) {
+					return  temp;
+				}
+				i++;
 				children = node.getChildrenDfts()[i];
-	           }
-	           return null;
+			}
+			return null;
 		} else {
 			return node;
 		}
