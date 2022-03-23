@@ -1,38 +1,21 @@
 package edu.uptc.so.fms.console;
 
-import java.util.Scanner;
-
 import edu.uptc.so.fms.FileManagerSystem;
 import edu.uptc.so.fms.FileType;
 import edu.uptc.so.fms.utils.TestUtils;
 
-public class FMSConsole implements Runnable {
+public class FMSConsole {
+
 	private String dir = "/";
-	private Thread t;
-	private Scanner sc;
 
-	public FMSConsole() {
-		this.sc = new Scanner(System.in);
-		this.t = new Thread(this);
-	}
-
-	@Override
-	public void run() {
-		while(true) {
-			this.menu();
-		}
-	}
-
-	public void start() {
-		t.start();
-	}
-
-	public void menu() {
-		System.out.print("fms#" + this.dir + ">");
+	public String evaluate(String command) {
+		if(command.isBlank()) return dir;
+		command = command.trim();
 		
-		String[] line = sc.nextLine().split(" ");
+		String[] line = command.split(" ");
 		
 		switch (line[0]) {
+		
 		case "list": {
 			System.out.println(TestUtils.childrenString(FileManagerSystem.getInstance().readDFT(this.dir)));;
 			break;
@@ -64,5 +47,6 @@ public class FMSConsole implements Runnable {
 		default:
 			System.out.println("No existe comando " + line[0]);
 		}
+		return dir;
 	}
 }

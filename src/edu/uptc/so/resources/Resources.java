@@ -27,7 +27,7 @@ public class Resources {
 	}
 	
 	public static byte[] writeDisk(int position, byte[] buffer) {
-		System.out.println("Escritura en: " + position + ", bytes:" + buffer.length);
+		//System.out.println("Escritura en: " + position + ", bytes:" + buffer.length);
 		try {
 			RandomAccessFile raf = new RandomAccessFile(disk, "rw");
 			raf.seek(position);
