@@ -33,7 +33,7 @@ public class DFTTable extends JPanel{
         add(lblTitle, BorderLayout.NORTH);
         modelo = new DefaultTableModel();
         //"id", "type", "name", "head", "visibility","createdAt","updatedAt", "accessedAt", "size","children"
-        String[] headers = {"name", "head", "visibility", "Sons"};
+        String[] headers = {"id", "name","type", "head", "visibility","createdAt","updatedAt", "accessedAt", "size","children"};
         modelo.setColumnIdentifiers(headers);
         tableProces = new JTable(modelo);
         add(new JScrollPane(tableProces),BorderLayout.CENTER);
@@ -42,8 +42,10 @@ public class DFTTable extends JPanel{
     public void setInfoTable(DFT root){
         modelo.setRowCount(0);
         if(root != null){
-            String[] info = {root.getName(), root.getHead() +"", 
-            root.getVisibility() +"", root.getChildrenDfts().length +""};
+            String[] info = {root.getId()+"",root.getName(),root.getType()+"",
+                root.getHead() +"",root.getVisibility() +"",root.getCreatedAt()+"",
+                root.getUpdatedAt()+"",root.getAccessedAt()+"",root.getSize()+"",
+                root.getChildrenDfts().length +"" };
             modelo.addRow(info);
             fillWithTree(root.getChildrenDfts());
         }
@@ -52,8 +54,12 @@ public class DFTTable extends JPanel{
     public void fillWithTree(DFT[] root){
         for (int i = 0; i < root.length; i++) {
             if (root[i]!=null) {
-                String[] info = {root[i].getName(), root[i].getHead() +"",
-                    root[i].getVisibility() +"",root[i].getChildrenDfts().length +"" };
+                //"id", "type", "name", "head", "visibility","createdAt","updatedAt", "accessedAt", "size","children"
+                String[] info = {root[i].getId()+"",root[i].getName(),
+                    root[i].getType()+"", root[i].getHead() +"",
+                    root[i].getVisibility() +"",root[i].getCreatedAt()+"",
+                    root[i].getUpdatedAt()+"",root[i].getAccessedAt()+"",
+                    root[i].getSize()+"",root[i].getChildrenDfts().length +"" };
                 modelo.addRow(info);
                 fillWithTree(root[i].getChildrenDfts());
             }
