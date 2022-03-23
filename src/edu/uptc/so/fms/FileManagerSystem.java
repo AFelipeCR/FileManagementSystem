@@ -175,8 +175,9 @@ public class FileManagerSystem implements FMSConstants {
 		return dirAux.getHead();
 	}
 
-	public void close(String filename, String path) {
-
+	public void close(String path, byte[] data) {
+		overwrite(path, data);
+		dirs.remove(path);
 	}
 
 	public static FileManagerSystem getInstance() {
