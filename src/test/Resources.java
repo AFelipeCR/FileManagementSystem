@@ -1,24 +1,16 @@
 package test;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.Random;
 
-import edu.uptc.so.fms.Constants;
-
 public class Resources {
+	private static final File disk = new File("./disk.txt");
 	
 
 	public static byte[] readDisk(int position, int bufferSize) {
-		File disk = new File("./disk.txt");
-		
-
 		try {
 			RandomAccessFile raf = new RandomAccessFile(disk, "r");
 			byte[] bytes = new byte[bufferSize];
@@ -36,9 +28,7 @@ public class Resources {
 	}
 	
 	public static byte[] writeDisk(int position, byte[] buffer) {
-		File disk = new File("./disk.txt");
-		
-
+		System.out.println("Escritura en: " + position + ", bytes:" + buffer.length);
 		try {
 			RandomAccessFile raf = new RandomAccessFile(disk, "rw");
 			raf.seek(position);
@@ -51,48 +41,34 @@ public class Resources {
 		
 		return null;
 	}
-	
-	
-	public static void format(int size) {
-		File disk = new File("./disk.txt");
-		
-		try {
-			DataOutputStream dos = new DataOutputStream(new FileOutputStream(disk));
-			byte[] bs = new byte[size];
-			dos.write(bs);
-			dos.close();
-		} catch (FileNotFoundException e) {
-		} catch (IOException e) {
-		}
-	}
-	
-	public static void formatFAT(int size) {
-		File disk = new File("./disk.txt");
-		
-		try {
-			byte[] bs = new byte[size];
-			RandomAccessFile raf = new RandomAccessFile(disk, "rw");
-			raf.write(bs);
-			raf.close();
-		} catch (FileNotFoundException e) {
-		} catch (IOException e) {
-		}
-	}
-
-	public static void formatDirectories(int fatSize, byte[] buffer) {
-		File disk = new File("./disk.txt");
-		
-		try {
-			RandomAccessFile raf = new RandomAccessFile(disk, "rw");
-			raf.seek(fatSize);
-			raf.write(buffer);
-			raf.close();
-		} catch (FileNotFoundException e) {
-		} catch (IOException e) {
-		}
-	}
 
 	public static short freeDir() {
 		return (short) (new Random().nextInt(99) + 1);
+	}
+	
+	public static short freeSpace(int size, int from, int to, Short s) {
+		try {
+			RandomAccessFile raf = new RandomAccessFile(disk, "r");
+			byte[] bytes = new byte[2];
+			short ret = -1;
+			
+			for (int i = from; i < to; i += size) {
+				raf.seek(i);
+				raf.read(bytes);
+				
+				if(bytes[0] == 0 && bytes[1] == 0) {
+					ret = (short) ((i - from) / size);
+					break;
+				}
+			}
+			
+			raf.close();
+			return ret;
+		} catch (FileNotFoundException e) {
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return -1;
 	}
 }

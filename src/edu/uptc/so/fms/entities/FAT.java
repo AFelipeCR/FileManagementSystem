@@ -23,4 +23,22 @@ public class FAT {
 	public FATRow[] getRows() {
 		return rows;
 	}
+
+
+	public FATRow freeRow() {
+		for (FATRow fatRow : rows) {
+			if(fatRow.getStatus() == 0)
+				return fatRow;
+		}
+		
+		return null;
+}
+
+	public byte[] toBytes() {
+		byte[] bs = new byte[Constants.FAT_SIZE];
+		for (int i = 0; i < rows.length; i++) {
+			System.arraycopy(rows[i].toBytes(), 0, bs, i * Constants.FAT_ROW_SIZE, Constants.FAT_ROW_SIZE);
+		}				
+		return bs;
+	}
 }

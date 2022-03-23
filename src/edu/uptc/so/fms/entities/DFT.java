@@ -36,16 +36,16 @@ public class DFT {
 		if(this.type == FileType.DIR.ordinal())
 			this.children = new DFT[100];
 	}
-
-	public DFT(short id, byte type, String name, byte visibility, long createdAt) {
+	
+	public DFT(short id, FileType type, String name, short head, byte visibility, long createdAt) {
 		this.id = id;
-		this.type = type;
+		this.type = (byte) type.ordinal();
 		this.name = name;
-		this.head = -1;
+		this.head = head;
 		this.visibility = visibility;
 		this.createdAt = this.updatedAt = this.accessedAt = createdAt;
 		
-		if(this.type == FileType.DIR.ordinal())
+		if(type == FileType.DIR)
 			this.children = new DFT[100];
 	}
 
@@ -108,18 +108,47 @@ public class DFT {
 		return d;
 	}
 
-	public DFT add(String path, short id) {
+	public DFT add(String path, short id, FileType type, short head) {
 		int i = 0;
 
 		DFT aux = this.children[i];
 		i++;
+		
 		while (aux != null && i < this.children.length) {
 			aux = this.children[i];
 			i++;
 		}
 		
-		return this.children[i - 1] = new DFT(id, (byte) FileType.DIR.ordinal(), path, (byte) Attributes.NORMAL.ordinal(),
+		return this.children[i - 1] = new DFT(id, type, path, head, (byte) Attributes.NORMAL.ordinal(),
 				System.currentTimeMillis());
+	}
+
+	public short getId() {
+		return id;
+	}
+
+	public byte getType() {
+		return type;
+	}
+
+	public long getCreatedAt() {
+		return createdAt;
+	}
+
+	public long getUpdatedAt() {
+		return updatedAt;
+	}
+
+	public long getAccessedAt() {
+		return accessedAt;
+	}
+
+	public short getSize() {
+		return size;
+	}
+
+	public DFT[] getChildren() {
+		return children;
 	}
 
 	public String longListing() {
@@ -135,5 +164,18 @@ public class DFT {
 	
 	public DFT[] getChildrenDfts() {
 		return children;
+	}
+	
+	public void setChildren(DFT[] children) {
+		this.children = children;
+	}
+
+	public static short[] childrenIds(byte[] childrenBytes) {
+		short[] ids = new short[100];
+		for (int i = 0, j = 0; i < childrenBytes.length && j < ids.length ; i+=2, j++) {
+			ids[j] = Utils.bytesToShort(Arrays.copyOfRange(childrenBytes, i, i + 2));
+		}
+		
+		return ids;
 	}
 }
