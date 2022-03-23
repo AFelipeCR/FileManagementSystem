@@ -1,6 +1,7 @@
 package edu.uptc.so.fms;
 
 import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -80,38 +81,84 @@ public class FileManagerSystem implements FMSConstants {
 	 */
 	public void write(String path, FileType type) {
 		String[] aux = path.split("/");
-		DFT dirAux = this.rootDir;
+		
+		String[] pathArray = path.split("/");
+		
+		DFT dft = this.searchDFT(this.rootDir, Arrays.copyOfRange(pathArray, 0, pathArray.length - 1));
 
-		for (int i = 1; i < aux.length - 1; i++) {
-			dirAux = dirAux.contains(aux[i]);
-		}
-
+		if(dft == null)
+			return;
+		
 		FATRow head = this.fat.freeRow();
 
-		DFT currentDFT = dirAux.add(aux[aux.length - 1],
+		DFT currentDFT = dft.add(aux[aux.length - 1],
 				Resources.freeSpace(DFT_SIZE, FAT_SIZE, FAT_SIZE + DIR_SIZE, (short) 0), type, head.getId());
 		this.dirs.put(path, currentDFT);
 		head.setStatus((byte) 1);
 		head.setNext((short) -1);
 		Resources.writeDisk(head.getId() * FAT_ROW_SIZE, head.toBytes());
 		Resources.writeDisk(FAT_SIZE + currentDFT.getId() * DFT_SIZE, currentDFT.toBytes());
-		int pos = FAT_SIZE + DIR_SIZE + dirAux.getHead() * CLUSTER_SIZE;
+		int pos = FAT_SIZE + DIR_SIZE + dft.getHead() * CLUSTER_SIZE;
 		Resources.writeDisk(pos + Resources.freeSpace(2, pos, pos + CLUSTER_SIZE, (short) 0) * 2,
 				Utils.shortToBytes(currentDFT.getId()));
 	}
 
-	public DFT read(String path) {
+	public DFT readDFT(String path) {
 		if (this.dirs.containsKey(path))
 			return this.dirs.get(path);
-
-		String[] aux = path.split("/");
-		DFT dirAux = this.rootDir;
-
-		for (int i = 0; i < aux.length; i++) {
-			dirAux = dirAux.contains(aux[i]);
+		
+		DFT dft = this.searchDFT(this.rootDir, path.split("/"));
+		
+		if(dft != null)
+			 this.dirs.put(path, dft);
+		
+		return dft;
+	}
+	
+	public DFT searchDFT(DFT dft, String[] path, int index) {
+		if(path.length == 1)
+			return dft;
+		
+		if(index >= path.length)
+			return null;
+		
+		for (DFT d : dft.getChildrenList()) {
+			
+			if(d.getName().contentEquals(path[index]))
+				if(index == path.length - 1)
+					return d;
+				else
+					return this.searchDFT(d, path, index + 1);
 		}
+		
+		return null;
+	}
 
-		return dirAux;
+	public DFT searchDFT(DFT dft, String[] path) {
+		return this.searchDFT(dft, path, 1);
+	}
+	
+	public short[] read(String path){
+			//Searches for path in dirs if exists set auxHead to head
+			ArrayList<Short> blocksIDs = new ArrayList<Short>();
+			short auxHead = this.open(path);
+			FATRow aux = this.fat.getRowByID(auxHead);
+			//Traverse tree until next is -1
+			blocksIDs.add(auxHead);
+			
+			while(aux.getNext() != -1) {
+				blocksIDs.add(aux.getId());
+				aux = this.fat.getRowByID(aux.getNext());
+			}
+			
+			//Convert from arrayList to regular Array
+			short[] toReturn = new short[blocksIDs.size()];
+			
+			for(int i = 0; i < toReturn.length; i++) {
+				toReturn[i] = blocksIDs.get(i);
+			}
+			
+			return toReturn;
 	}
 
 	public short open(String path) {

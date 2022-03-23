@@ -2,7 +2,11 @@ package edu.uptc.so.fms.utils;
 
 import java.nio.ByteBuffer;
 
-public interface Utils {
+import edu.uptc.so.fms.FMSConstants;
+import edu.uptc.so.fms.entities.DFT;
+import edu.uptc.so.resources.Resources;
+
+public interface Utils extends FMSConstants {
 	public static byte[] longToBytes(long x) {
 	    ByteBuffer buffer = ByteBuffer.allocate(Long.BYTES);
 	    buffer.putLong(x);
@@ -64,6 +68,19 @@ public interface Utils {
 		for (int i = position; i < position + part.length; i++) {
 			bytes[i] = part[i - position];
 		}
+	}
+	
+	public static void loadDFTChildren(DFT dft) {
+		DFT[] dfts = new DFT[100];
+		short[] ids = DFT.childrenIds(
+				Resources.readDisk(FAT_SIZE + DIR_SIZE + dft.getHead() * CLUSTER_SIZE, CLUSTER_SIZE));
+
+		for (int i = 0; i < dfts.length; i++) {
+			if (ids[i] != 0)
+				dfts[i] = new DFT(Resources.readDisk(FAT_SIZE + ids[i] * DFT_SIZE, DFT_SIZE));
+		}
+
+		dft.setChildren(dfts);
 	}
 	
 }

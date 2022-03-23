@@ -2,8 +2,10 @@ package edu.uptc.so.fms.entities;
 
 import java.text.Format;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 import edu.uptc.so.fms.Attributes;
 import edu.uptc.so.fms.FMSConstants;
@@ -21,6 +23,7 @@ public class DFT {
 	private long accessedAt;
 	private short size;
 	private DFT[] children;
+	private boolean areChildrenCharged = false;
 
 	public DFT(byte[] dftBytes) {
 		this.id = Utils.bytesToShort(Arrays.copyOfRange(dftBytes, 0, 2));
@@ -151,15 +154,21 @@ public class DFT {
 		return children;
 	}
 
-	public String list() {
-		String s = "";
-		
-		for (DFT c : children) {
-			if(c != null)
-				s += c.name+ " ";
+	public List<DFT> getChildrenList(){
+		if(!this.areChildrenCharged) {
+			Utils.loadDFTChildren(this);
+			
+			this.areChildrenCharged = true;
 		}
 		
-		return s;
+		List<DFT> dfts = new ArrayList<>();
+		
+		for (DFT dft : this.children) {
+			if(dft != null)
+				dfts.add(dft);
+		}
+		
+		return dfts;
 	}
 	
 	public DFT[] getChildrenDfts() {
