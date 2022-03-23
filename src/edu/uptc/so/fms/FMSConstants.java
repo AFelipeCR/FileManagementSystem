@@ -1,6 +1,6 @@
 package edu.uptc.so.fms;
 
-public class Constants {
+public interface FMSConstants {
 	public static final int DFT_SIZE = 43;
 	public static final int FAT_ROW_SIZE = 3;
 	public static final int FAT_SIZE = FAT_ROW_SIZE * 1000;

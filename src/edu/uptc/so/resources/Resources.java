@@ -1,10 +1,9 @@
-package test;
+package edu.uptc.so.resources;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.util.Random;
 
 public class Resources {
 	private static final File disk = new File("./disk.txt");
@@ -40,10 +39,6 @@ public class Resources {
 		
 		
 		return null;
-	}
-
-	public static short freeDir() {
-		return (short) (new Random().nextInt(99) + 1);
 	}
 	
 	public static short freeSpace(int size, int from, int to, Short s) {

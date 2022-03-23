@@ -30,8 +30,8 @@ public class FMSConsole implements Runnable {
 		String[] line = sc.nextLine().split(" ");
 		
 		switch (line[0]) {
-		case "ls": {
-			System.out.println(FileManagerSystem.getInstance().read(line[1]).longListing());
+		case "list": {
+			System.out.println(FileManagerSystem.getInstance().read(line[1]).list());
 			break;
 		}
 		default:

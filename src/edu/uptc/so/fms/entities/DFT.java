@@ -6,7 +6,7 @@ import java.util.Arrays;
 import java.util.Date;
 
 import edu.uptc.so.fms.Attributes;
-import edu.uptc.so.fms.Constants;
+import edu.uptc.so.fms.FMSConstants;
 import edu.uptc.so.fms.FileType;
 import edu.uptc.so.fms.utils.Utils;
 
@@ -81,7 +81,7 @@ public class DFT {
 	}
 
 	public byte[] toBytes() {
-		byte[] bytes = new byte[Constants.DFT_SIZE];
+		byte[] bytes = new byte[FMSConstants.DFT_SIZE];
 		Utils.fillBytes(bytes, Utils.shortToBytes(this.id), 0);
 		bytes[2] = this.type;
 		Utils.fillBytes(bytes, Utils.stringToBytes(this.name, 11), 3);
@@ -151,7 +151,7 @@ public class DFT {
 		return children;
 	}
 
-	public String longListing() {
+	public String list() {
 		String s = "";
 		
 		for (DFT c : children) {

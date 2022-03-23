@@ -8,9 +8,9 @@ import edu.uptc.so.fms.entities.DFT;
 import edu.uptc.so.fms.entities.FAT;
 import edu.uptc.so.fms.entities.FATRow;
 import edu.uptc.so.fms.utils.Utils;
-import test.Resources;
+import edu.uptc.so.resources.Resources;
 
-public class FileManagerSystem {
+public class FileManagerSystem implements FMSConstants {
 	private static FileManagerSystem fms = null;
 	private FAT fat;
 	private Map<String, DFT> dirs;
@@ -18,7 +18,7 @@ public class FileManagerSystem {
 	private DFT rootDir;
 
 	private FileManagerSystem() {
-		this.fat = new FAT(Resources.readDisk(0, Constants.FAT_SIZE));
+		this.fat = new FAT(Resources.readDisk(0, FAT_SIZE));
 		this.dirs = new HashMap<String, DFT>();
 	}
 
@@ -26,45 +26,48 @@ public class FileManagerSystem {
 		if (!this.dirs.containsKey(path))
 			return;
 
-		double blocks = Math.ceil(data.length / (double) Constants.CLUSTER_SIZE);
+		double blocks = Math.ceil(data.length / (double) CLUSTER_SIZE);
 		DFT node = this.dirs.get(path);
 
 		short p = -1;
 
 		for (short i = 0, n = node.getHead(); i < blocks; i++, p = n, n = this.fat.getRows()[n].getNext()) {
-			int from = i * Constants.CLUSTER_SIZE;
-			int to = from + Constants.CLUSTER_SIZE;
+			int from = i * CLUSTER_SIZE;
+			int to = from + CLUSTER_SIZE;
 
 			if (to > data.length)
 				to = data.length;
 
 			if (n == 0 || n == -1) {
-				n = fat.freeRow().getId();
+				n = this.fat.freeRow().getId();
 
 				if (p == -1)
 					node.setHead(n);
 				else
-					fat.getRows()[p].setNext(n);
+					this.fat.getRows()[p].setNext(n);
 			}
-			fat.getRows()[n].setStatus((byte) 1);
+			
+			this.fat.getRows()[n].setStatus((byte) 1);
 			Resources.writeDisk(getPositionToWrite(n), Arrays.copyOfRange(data, from, to));
 		}
 
-		clearBlocks(p, fat);
+		clearBlocks(p, this.fat);
 	}
 
 	public int getPositionToWrite(short block) {
-		return Constants.RESERVED_SPACE + block * Constants.CLUSTER_SIZE;
+		return RESERVED_SPACE + block * CLUSTER_SIZE;
 	}
 
 	private void clearBlocks(short parent, FAT fat) {
-		if(parent == -1) return;
-		short next = fat.getRows()[parent].getNext();
+		if (parent == -1)
+			return;
 		
+		short next = fat.getRows()[parent].getNext();
+
 		for (short i = next; i != -1 && fat.getRows()[i].getStatus() == 1; i = fat.getRows()[i].getNext()) {
 			fat.getRows()[i].setStatus((byte) 0);
 		}
-		
+
 		fat.getRows()[parent].setNext((short) -1);
 		Resources.writeDisk(0, fat.toBytes());
 	}
@@ -85,15 +88,15 @@ public class FileManagerSystem {
 
 		FATRow head = this.fat.freeRow();
 
-		DFT currentDFT = dirAux.add(aux[aux.length - 1], Resources.freeSpace(Constants.DFT_SIZE, Constants.FAT_SIZE,
-				Constants.FAT_SIZE + Constants.DIR_SIZE, (short) 0), type, head.getId());
+		DFT currentDFT = dirAux.add(aux[aux.length - 1],
+				Resources.freeSpace(DFT_SIZE, FAT_SIZE, FAT_SIZE + DIR_SIZE, (short) 0), type, head.getId());
 		this.dirs.put(path, currentDFT);
 		head.setStatus((byte) 1);
 		head.setNext((short) -1);
-		Resources.writeDisk(head.getId() * Constants.FAT_ROW_SIZE, head.toBytes());
-		Resources.writeDisk(Constants.FAT_SIZE + currentDFT.getId() * Constants.DFT_SIZE, currentDFT.toBytes());
-		int pos = Constants.FAT_SIZE + Constants.DIR_SIZE + dirAux.getHead() * Constants.CLUSTER_SIZE;
-		Resources.writeDisk(pos + Resources.freeSpace(2, pos, pos + Constants.CLUSTER_SIZE, (short) 0) * 2,
+		Resources.writeDisk(head.getId() * FAT_ROW_SIZE, head.toBytes());
+		Resources.writeDisk(FAT_SIZE + currentDFT.getId() * DFT_SIZE, currentDFT.toBytes());
+		int pos = FAT_SIZE + DIR_SIZE + dirAux.getHead() * CLUSTER_SIZE;
+		Resources.writeDisk(pos + Resources.freeSpace(2, pos, pos + CLUSTER_SIZE, (short) 0) * 2,
 				Utils.shortToBytes(currentDFT.getId()));
 	}
 
@@ -141,28 +144,26 @@ public class FileManagerSystem {
 	}
 
 	public void format() {
-		Resources.writeDisk(0, new byte[Constants.DISK_SIZE]);
-		this.fat = new FAT(Resources.readDisk(0, Constants.FAT_SIZE));
+		Resources.writeDisk(0, new byte[DISK_SIZE]);
+		this.fat = new FAT(Resources.readDisk(0, FAT_SIZE));
 		FATRow head = this.fat.freeRow();
 		head.setStatus((byte) 1);
 		head.setNext((short) -1);
 		DFT dft = new DFT((short) 1, FileType.DIR, "/", head.getId(), (byte) 0, System.currentTimeMillis());
-		Resources.writeDisk(head.getId() * Constants.FAT_ROW_SIZE, head.toBytes());
-		Resources.writeDisk(Constants.FAT_SIZE, dft.toBytes());
+		Resources.writeDisk(head.getId() * FAT_ROW_SIZE, head.toBytes());
+		Resources.writeDisk(FAT_SIZE, dft.toBytes());
 		this.rootDir = dft;
 	}
 
 	public void init() {
-		this.rootDir = new DFT(Resources.readDisk(Constants.FAT_SIZE, Constants.DFT_SIZE));
+		this.rootDir = new DFT(Resources.readDisk(FAT_SIZE, DFT_SIZE));
 		DFT[] dfts = new DFT[100];
-		short[] ids = DFT.childrenIds(Resources.readDisk(
-				Constants.FAT_SIZE + Constants.DIR_SIZE + this.rootDir.getHead() * Constants.CLUSTER_SIZE,
-				Constants.CLUSTER_SIZE));
+		short[] ids = DFT.childrenIds(
+				Resources.readDisk(FAT_SIZE + DIR_SIZE + this.rootDir.getHead() * CLUSTER_SIZE, CLUSTER_SIZE));
 
 		for (int i = 0; i < dfts.length; i++) {
 			if (ids[i] != 0)
-				dfts[i] = new DFT(
-						Resources.readDisk(Constants.FAT_SIZE + ids[i] * Constants.DFT_SIZE, Constants.DFT_SIZE));
+				dfts[i] = new DFT(Resources.readDisk(FAT_SIZE + ids[i] * DFT_SIZE, DFT_SIZE));
 		}
 
 		this.rootDir.setChildren(dfts);
