@@ -10,22 +10,27 @@ public class JpCard extends JPanel implements ActionListener{
 
 	private static final long serialVersionUID = 1L;
 	private CardLayout cards = new CardLayout( );
+        private JPanel panelCardLeft;
+        private JPanel panelCardRight;
+        
 
 	public JpCard(DFT root, FATRow[] row) {
-		setLayout(null);
-		setLayout(cards);
-		
-		
-		JpTree jpTree = new JpTree(root, this);
-		add(jpTree);
-		
-		DFTTable dftTable = new DFTTable(this);
-		dftTable.setInfoTable(root);
-		add(dftTable);
-		
-		FATTable fattable = new FATTable(this);
-                fattable.setInfoTable(row);
+                removeAll();
+                setLayout(new GridLayout(1, 2));
+
+                FATTable fattable = new FATTable(this);
+                    fattable.setInfoTable(row);
                 add(fattable);
+                
+                panelCardRight = new JPanel();
+                    panelCardRight.setLayout(null);
+                    panelCardRight.setLayout(cards);
+                    DFTTable dftTable = new DFTTable(this);
+                    dftTable.setInfoTable(root);
+                    panelCardRight.add(dftTable, BorderLayout.CENTER);
+                    JpTree jpTree = new JpTree(root, this);
+                    panelCardRight.add(jpTree);
+                add(panelCardRight);
 	}
 	
 //	public static void main(String[] args) {
@@ -46,7 +51,6 @@ public class JpCard extends JPanel implements ActionListener{
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		cards.next(JpCard.this);
-		
+		cards.next(panelCardRight);
 	}
 }

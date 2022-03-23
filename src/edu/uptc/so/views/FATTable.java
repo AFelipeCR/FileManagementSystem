@@ -25,10 +25,10 @@ public class FATTable extends JPanel{
 
     private void createTable(ActionListener listener) {
          setLayout(new BorderLayout());
-        lblTitle = new JLabel("DFT info");
-        jButton = new JButton("Arbol");
+        lblTitle = new JLabel("FAT info");
+        jButton = new JButton("FAT");
 		jButton.addActionListener(listener);
-		add(jButton, BorderLayout.SOUTH);
+		//add(jButton, BorderLayout.SOUTH);
         add(lblTitle, BorderLayout.NORTH);
         modelo = new DefaultTableModel();
         //"id", "type", "name", "head", "visibility","createdAt","updatedAt", "accessedAt", "size","children"
@@ -46,8 +46,8 @@ public class FATTable extends JPanel{
     public void fillWithList(FATRow[] row){
         for (int i = 0; i < row.length; i++) {
             if (row[i]!=null) {
-                        String[] info = {row[i].getStatus()+"",
-                            row[i].getId()+"", row[i].getNext() +""};
+                String[] info = {row[i].getStatus()+"",
+                    row[i].getId()+"", row[i].getNext() +""};
                 modelo.addRow(info);
             }
         }

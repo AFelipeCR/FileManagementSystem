@@ -36,7 +36,8 @@ public class JpTree extends JPanel implements MouseListener{
 	
 	
 	public void paintTree(DFT root) {
-		this.root = root;
+            if(root != null){
+                this.root = root;
 		DefaultMutableTreeNode visualRoot = new DefaultMutableTreeNode(this.root.getName());
 		for (DFT child : this.root.getChildrenDfts()) {
 			if (child != null) {
@@ -47,17 +48,25 @@ public class JpTree extends JPanel implements MouseListener{
 		jTree.addMouseListener(this);
 		jTree.setModel(treeModel);
 		jTree.repaint();
+            }else{
+                DefaultMutableTreeNode visualRoot = new DefaultMutableTreeNode("root empty");
+                treeModel = new DefaultTreeModel(visualRoot);
+		jTree.addMouseListener(this);
+		jTree.setModel(treeModel);
+		jTree.repaint();
+            }
+            
 	}
 	
 	private void addChild(DefaultMutableTreeNode father, DFT node) {
 		if (node != null) {
-			DefaultMutableTreeNode visualNode = new DefaultMutableTreeNode(node.getName());
-			father.add(visualNode);
-			if(node.getChildrenDfts()[0]!=null) {
-				for (DFT child : node.getChildrenDfts()) {
-					addChild(visualNode, child);
-				}	
-			}
+                    DefaultMutableTreeNode visualNode = new DefaultMutableTreeNode(node.getName());
+                    father.add(visualNode);
+                    if(node.getChildrenDfts()[0]!=null) {
+                            for (DFT child : node.getChildrenDfts()) {
+                                    addChild(visualNode, child);
+                            }	
+                    }
 		}
 	} 
 	
@@ -115,9 +124,9 @@ public class JpTree extends JPanel implements MouseListener{
 		DFT dft = searchDFT(nameDFT(path(treePath)), root);
 		if(dft != null ){
 			JLabel jlName = new JLabel("Nombre:      " + dft.getName());
-			JLabel jlPath = new JLabel("Ubicación:  " + path(treePath));
+			JLabel jlPath = new JLabel("Ubicaciï¿½n:  " + path(treePath));
 			JLabel jlCreatedAt = new JLabel("Creado:       " + dft.getName()); // getCreatedAt
-			JLabel jlSize = new JLabel("Tamaño:     " + dft.getName()); //getSize
+			JLabel jlSize = new JLabel("Tamaï¿½o:     " + dft.getName()); //getSize
 			jPopMenu.add(jlName);
 			jPopMenu.add(jlPath);
 			jPopMenu.add(jlCreatedAt);

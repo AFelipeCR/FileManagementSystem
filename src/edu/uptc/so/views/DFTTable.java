@@ -14,8 +14,8 @@ import javax.swing.table.DefaultTableModel;
 
 public class DFTTable extends JPanel{
     
-	private static final long serialVersionUID = 1L;
-	private JTable tableProces;
+    private static final long serialVersionUID = 1L;
+    private JTable tableProces;
     private DefaultTableModel modelo;
     private JLabel lblTitle;
     private JButton jButton;
@@ -41,10 +41,12 @@ public class DFTTable extends JPanel{
     
     public void setInfoTable(DFT root){
         modelo.setRowCount(0);
-        String[] info = {root.getName(), root.getHead() +"", 
+        if(root != null){
+            String[] info = {root.getName(), root.getHead() +"", 
             root.getVisibility() +"", root.getChildrenDfts().length +""};
             modelo.addRow(info);
-        fillWithTree(root.getChildrenDfts());
+            fillWithTree(root.getChildrenDfts());
+        }
     }
     
     public void fillWithTree(DFT[] root){
