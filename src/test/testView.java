@@ -1,6 +1,7 @@
 
 package test;
 
+import edu.uptc.so.fms.FileType;
 import edu.uptc.so.fms.entities.DFT;
 import edu.uptc.so.fms.entities.FATRow;
 import edu.uptc.so.views.JpCard;
@@ -28,6 +29,13 @@ public class testView extends JFrame{
 //        b[2] = 15;
 //        //DFT df = new DFT(b);
 //        FATRow[] fat = new FATRow[2];
-//        new testView(null, fat);
+//        
+//        DFT dft = new DFT((short)1, FileType.DIR, "root", (short)2 ,(byte)1, System.currentTimeMillis());
+//		dft.add("carpeta 1", (short)2, FileType.DIR, (short)1);
+//		dft.add("carpeta 2", (short)3, FileType.DIR, (short)2);
+//		dft.add("carpeta 3", (short)4, FileType.DIR, (short)3);
+//		dft.add("carpeta 4", (short)5, FileType.DIR, (short)1);
+//		
+//        new testView(dft, fat);
 //    }
 }

@@ -4,6 +4,9 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.text.Format;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -125,8 +128,9 @@ public class JpTree extends JPanel implements MouseListener{
 		if(dft != null ){
 			JLabel jlName = new JLabel("Nombre:      " + dft.getName());
 			JLabel jlPath = new JLabel("Ubicacion:  " + path(treePath));
-			JLabel jlCreatedAt = new JLabel("Creado:       " + dft.getCreatedAt()); // getCreatedAt
-			JLabel jlSize = new JLabel("Tamaño:     " + dft.getSize()); //getSize
+			Format format = new SimpleDateFormat("dd/MM/yyyy");
+			JLabel jlCreatedAt = new JLabel("Creado:       " + format.format(new Date(dft.getCreatedAt())));
+			JLabel jlSize = new JLabel("Tamaño:     " + dft.getSize());
 			jPopMenu.add(jlName);
 			jPopMenu.add(jlPath);
 			jPopMenu.add(jlCreatedAt);
