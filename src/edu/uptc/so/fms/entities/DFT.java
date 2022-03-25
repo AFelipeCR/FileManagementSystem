@@ -28,7 +28,7 @@ public class DFT {
 	public DFT(byte[] dftBytes) {
 		this.id = Utils.bytesToShort(Arrays.copyOfRange(dftBytes, 0, 2));
 		this.type = dftBytes[2];
-		this.name = Utils.bytesToString(Arrays.copyOfRange(dftBytes, 0, 11), 3, 11);
+		this.name = Utils.bytesToString(Arrays.copyOfRange(dftBytes, 3, 14), 0, 11);
 		this.head = Utils.bytesToShort(Arrays.copyOfRange(dftBytes, 14, 16));
 		this.visibility = dftBytes[16];
 		this.createdAt = Utils.bytesToLong(Arrays.copyOfRange(dftBytes, 17, 25));
@@ -75,6 +75,10 @@ public class DFT {
 	public void setVisibility(byte visibility) {
 		this.visibility = visibility;
 	}
+	
+	public void setSize(short size) {
+		this.size = size;
+	}
 
 	public String toText() {
 		Format format = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
@@ -109,6 +113,16 @@ public class DFT {
 		}
 
 		return d;
+	}
+	
+	public DFT contains2(String filename) {
+		for (DFT s : this.getChildrenList()) {
+			System.out.println(s.name.contentEquals(filename) + filename + " "+ s.name);
+			if (s.name.contentEquals(filename))
+				return s;
+		}
+
+		return null;
 	}
 
 	public DFT add(String path, short id, FileType type, short head) {
@@ -155,7 +169,10 @@ public class DFT {
 	}
 
 	public List<DFT> getChildrenList(){
-		if(!this.areChildrenCharged) {
+		if(this.type == FileType.FILE.ordinal())
+			return null;
+			
+		if(this.type == FileType.DIR.ordinal() && !this.areChildrenCharged) {
 			Utils.loadDFTChildren(this);
 			
 			this.areChildrenCharged = true;

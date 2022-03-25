@@ -24,11 +24,13 @@ public class FileManagerSystem implements FMSConstants {
 	}
 
 	public void overwrite(String path, byte[] data) {
-		if (!this.dirs.containsKey(path))
+		DFT node = this.readDFT(path);
+		
+		if(node == null)
 			return;
 
 		double blocks = Math.ceil(data.length / (double) CLUSTER_SIZE);
-		DFT node = this.dirs.get(path);
+		
 
 		short p = -1;
 
@@ -47,16 +49,15 @@ public class FileManagerSystem implements FMSConstants {
 				else
 					this.fat.getRows()[p].setNext(n);
 			}
-			
+	
 			this.fat.getRows()[n].setStatus((byte) 1);
-			Resources.writeDisk(getPositionToWrite(n), Arrays.copyOfRange(data, from, to));
+			Resources.writeDisk(RESERVED_SPACE + n * CLUSTER_SIZE, Arrays.copyOfRange(data, from, to));
 		}
+		
+		node.setSize((short) data.length);
+		Resources.writeDisk(FAT_SIZE + node.getId() * DFT_SIZE, node.toBytes());
 
 		clearBlocks(p, this.fat);
-	}
-
-	public int getPositionToWrite(short block) {
-		return RESERVED_SPACE + block * CLUSTER_SIZE;
 	}
 
 	private void clearBlocks(short parent, FAT fat) {
@@ -162,17 +163,27 @@ public class FileManagerSystem implements FMSConstants {
 	}
 
 	public short open(String path) {
+		DFT dirAux = this.openDFT(path);
+		
+		if(dirAux != null)
+			return dirAux.getHead();
+		
+		return -1;
+	}
+	
+	public DFT openDFT(String path) {
 		if (this.dirs.containsKey(path))
-			return this.dirs.get(path).getHead();
+			return this.dirs.get(path);
 
 		String[] aux = path.split("/");
 		DFT dirAux = this.rootDir;
 
-		for (int i = 0; i < aux.length; i++) {
-			dirAux = dirAux.contains(aux[i]);
+		for (int i = 1; i < aux.length; i++) {
+			System.out.println(aux[i]);
+			dirAux = dirAux.contains2(aux[i]);
 		}
 
-		return dirAux.getHead();
+		return dirAux;
 	}
 
 	public void close(String path, byte[] data) {
@@ -201,6 +212,10 @@ public class FileManagerSystem implements FMSConstants {
 		Resources.writeDisk(head.getId() * FAT_ROW_SIZE, head.toBytes());
 		Resources.writeDisk(FAT_SIZE, dft.toBytes());
 		this.rootDir = dft;
+	}
+	
+	public DFT getRoot() {
+		return rootDir;
 	}
 
 	public void init() {

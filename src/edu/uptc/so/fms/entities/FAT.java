@@ -46,12 +46,14 @@ public class FAT {
 		// no match, return null
 		boolean found = false;
 		int count = 0;
+		
 		while (!found && count < rows.length) {
 			if (id == rows[count].getId()) {
 				return rows[count];
 			}
 			count++;
 		}
+		
 		return null;
 	}
 }

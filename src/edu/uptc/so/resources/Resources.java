@@ -27,7 +27,6 @@ public class Resources {
 	}
 	
 	public static byte[] writeDisk(int position, byte[] buffer) {
-		//System.out.println("Escritura en: " + position + ", bytes:" + buffer.length);
 		try {
 			RandomAccessFile raf = new RandomAccessFile(disk, "rw");
 			raf.seek(position);
@@ -47,7 +46,7 @@ public class Resources {
 			byte[] bytes = new byte[2];
 			short ret = -1;
 			
-			for (int i = from; i < to; i += size) {
+			for (int i = from; i < to - size; i += size) {
 				raf.seek(i);
 				raf.read(bytes);
 				

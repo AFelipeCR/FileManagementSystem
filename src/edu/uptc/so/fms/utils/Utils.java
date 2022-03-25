@@ -64,6 +64,19 @@ public interface Utils extends FMSConstants {
 		return s;
 	}
 	
+	public static String bytesToString(byte[] bytes) {
+		String s = "";
+		
+		for (int i = 0; i < bytes.length; i++) {
+			if(bytes[i] == 0)
+				break;
+			
+			s += (char) bytes[i];
+		}
+		
+		return s;
+	}
+	
 	public static void fillBytes(byte[] bytes, byte[] part, int position) {
 		for (int i = position; i < position + part.length; i++) {
 			bytes[i] = part[i - position];
